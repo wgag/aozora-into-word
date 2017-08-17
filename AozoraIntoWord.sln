@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AozoraIntoWord", "AozoraIntoWord\AozoraIntoWord.csproj", "{BDFFCEE7-D320-46EE-8EB2-77DF4BD13835}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{55C574B9-9886-4A62-8B35-185B28A2192F}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BDFFCEE7-D320-46EE-8EB2-77DF4BD13835}.Debug|x86.ActiveCfg = Debug|x86
+		{BDFFCEE7-D320-46EE-8EB2-77DF4BD13835}.Debug|x86.Build.0 = Debug|x86
+		{BDFFCEE7-D320-46EE-8EB2-77DF4BD13835}.Release|x86.ActiveCfg = Release|x86
+		{BDFFCEE7-D320-46EE-8EB2-77DF4BD13835}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
