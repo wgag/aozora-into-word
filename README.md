@@ -1,4 +1,4 @@
-﻿# 青空-Word 変換
+# 青空-Word 変換
 
 ## 概要
 
@@ -19,8 +19,8 @@
 ## 動作環境
 
 - Windows XP, Vista, 7 など
-- [.NET Framework 4.0](http://www.microsoft.com/japan/msdn/netframework/)
 - Microsoft Office 2003 以上
+- .NET Framework 4.0
 
 
 ## template.doc について
@@ -33,4 +33,4 @@ template.doc は Word 文書のテンプレートファイルです。右クリ�
 
 jisx0213-2004-std.txt は下記サイトで配布されているものです。
 
-- [JIS X 0213のコード対応表 - x0213.org](http://x0213.org/codetable/)
+- [JIS X 0213 Code Mapping Tables - x0213.org](http://x0213.org/codetable/index.en.html)
