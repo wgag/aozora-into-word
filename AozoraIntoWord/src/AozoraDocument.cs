@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -15,12 +20,20 @@ namespace AozoraIntoWord
             TemplatePath = templatePath;
         }
 
-        public void GenerateWordDocument()
+        public void GenerateWordDocument(BackgroundWorker bw)
         {
             using (XmlTextReader reader = new XmlTextReader(FilePath))
             {
-                reader.DtdProcessing = System.Xml.DtdProcessing.Ignore;
-                reader.WhitespaceHandling = System.Xml.WhitespaceHandling.Significant;
+                reader.DtdProcessing = DtdProcessing.Ignore;
+                reader.WhitespaceHandling = WhitespaceHandling.Significant;
+
+                // check if the reading file is valid xhtml
+                reader.Read();
+                if (reader.NodeType != XmlNodeType.XmlDeclaration)
+                {
+                    throw new InvalidDataException("妥当な XHTML ファイルではありません。");
+                }
+
                 AozoraWordProcessor proc = new AozoraWordProcessor(TemplatePath);
                 proc.UseHorizInVert = true;
 
@@ -28,6 +41,11 @@ namespace AozoraIntoWord
 
                 while (reader.Read())
                 {
+                    if (bw.CancellationPending)
+                    {
+                        throw new OperationCanceledException();
+                    }
+
                     switch (reader.NodeType)
                     {
                         case XmlNodeType.Element:

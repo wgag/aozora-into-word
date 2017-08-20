@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
-//using Word = Microsoft.Office.Tools.Word;
-using System.Threading;
 using System.IO;
+using System.ComponentModel;
 
 namespace AozoraIntoWord
 {
@@ -11,87 +10,90 @@ namespace AozoraIntoWord
         public MainForm()
         {
             InitializeComponent();
+            Icon = global::AozoraIntoWord.Properties.Resources.ProgramIcon;
         }
 
         private void buttonRun_Click(object sender, EventArgs e)
         {
             btnRun.Enabled = false;
-            progressBar1.Style = ProgressBarStyle.Marquee;
 
-            ThreadStart threadStart = new ThreadStart(delegate()
-                {
-                    try
-                    {
-                        string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "template.dot");
-                        AozoraDocument aozora = new AozoraDocument(tbFilePath.Text, templatePath);
-                        aozora.GenerateWordDocument();
-                    }
-                    catch (Exception ex)
-                    {
-                        NotifyErrorMessage(ex);
-                    }
-                    finally
-                    {
-                        GenerationFinished(this, null);
-                    }
-                });
+            ProgressDialog progressDialog;
 
-            Thread thread = new Thread(threadStart);
-
-            thread.Start();
-        }
-        
-        delegate void NotifyErrorDelegate(Exception ex);
-
-        private void NotifyErrorMessage(Exception ex)
-        {
-            if (InvokeRequired)
+            using (BackgroundWorker bw = new BackgroundWorker())
             {
-                Invoke(new NotifyErrorDelegate(NotifyErrorMessage), ex);
-                return;
-            }
-            MessageBox.Show(Control.FromHandle(this.Handle), ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
+                progressDialog = new ProgressDialog(bw);
+                progressDialog.Text = "変換";
+                progressDialog.Message = "変換処理中...";
 
-        private void GenerationFinished(object sender, EventArgs e)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new EventHandler(GenerationFinished));
-                return;
+                bw.WorkerReportsProgress = true;
+                bw.WorkerSupportsCancellation = true;
+                bw.DoWork += new DoWorkEventHandler(DoProcessBkgnd);
+                bw.RunWorkerAsync();
             }
-            progressBar1.Style = ProgressBarStyle.Blocks;
+
+            ProgressDialogResult result = progressDialog.ShowDialog();
+
+            if (result == ProgressDialogResult.Success)
+            {
+                MessageBox.Show("変換に成功しました", "完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else if (result == ProgressDialogResult.Failure)
+            {
+                MessageBox.Show(progressDialog.Error.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (result == ProgressDialogResult.Canceled)
+            {
+                MessageBox.Show("ユーザーにより処理が中断されました。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
             btnRun.Enabled = true;
+            btnRun.Focus();
         }
 
+        void DoProcessBkgnd(object sender, DoWorkEventArgs eventArgs)
+        {
+            BackgroundWorker bw = sender as BackgroundWorker;
+
+            try
+            {
+                string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "template.dot");
+                AozoraDocument aozora = new AozoraDocument(tbFilePath.Text, templatePath);
+                aozora.GenerateWordDocument(bw);
+            }
+            catch (OperationCanceledException)
+            {
+                eventArgs.Cancel = true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
         private void btnBrowse_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog()
             {
-                 Multiselect = false,
-                 Filter = "HTML ファイル|*.html|すべてのファイル|*.*",
+                Multiselect = false,
+                Filter = "HTML ファイル|*.html|すべてのファイル|*.*",
             };
-            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (dialog.ShowDialog() == DialogResult.OK)
             {
                 tbFilePath.Text = dialog.FileName;
             }
-
         }
-
-
 
         private void MainForm_DragDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                string[] files = (string[]) e.Data.GetData(DataFormats.FileDrop, false);
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
                 tbFilePath.Text = files[0];
             }
             else if (e.Data.GetDataPresent(DataFormats.Text))
             {
-                tbFilePath.Text = (string) e.Data.GetData(DataFormats.Text);
-            }      
+                tbFilePath.Text = (string)e.Data.GetData(DataFormats.Text);
+            }
         }
 
         private void MainForm_DragEnter(object sender, DragEventArgs e)

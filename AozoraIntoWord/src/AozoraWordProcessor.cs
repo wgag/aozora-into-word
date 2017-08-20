@@ -43,7 +43,6 @@ namespace AozoraIntoWord
         public int Indent { get; set; }
         public bool UseHorizInVert { get; set; }
 
-
         public string TemplatePath { get; set; }
 
         public AozoraWordProcessor(string templatePath)
